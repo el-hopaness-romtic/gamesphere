@@ -5,6 +5,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import ru.gamesphere.model.Author;
 import ru.gamesphere.model.Book;
 
@@ -30,7 +31,7 @@ public class FactoryLibrary {
         readConnections("./library/connection.csv");
     }
 
-    private static void readBooks(String fileName) {
+    private static void readBooks(@NotNull String fileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             try (CSVReader csvReader = new CSVReader(br)) {
                 List<String> columns = Arrays.asList(csvReader.readNext());
@@ -54,7 +55,7 @@ public class FactoryLibrary {
         }
     }
 
-    private static void readAuthors(String fileName) {
+    private static void readAuthors(@NotNull String fileName) {
         Set<String> names = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             try (CSVReader csvReader = new CSVReader(br)) {
@@ -87,7 +88,7 @@ public class FactoryLibrary {
         }
     }
 
-    private static void readConnections(String fileName) {
+    private static void readConnections(@NotNull String fileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             try (CSVReader csvReader = new CSVReader(br)) {
                 List<String> columns = Arrays.asList(csvReader.readNext());
@@ -108,5 +109,4 @@ public class FactoryLibrary {
             e.printStackTrace();
         }
     }
-
 }

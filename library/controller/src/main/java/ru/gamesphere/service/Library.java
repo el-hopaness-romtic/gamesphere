@@ -12,15 +12,15 @@ public class Library {
     private final Map<Long, Author> authors = new HashMap<>();
     private final Map<Author, List<Book>> authorships = new HashMap<>();
 
-    void addBook(Book book) {
+    void addBook(@NotNull Book book) {
         books.put(book.getBookId(), book);
     }
 
-    void addAuthor(Author author) {
+    void addAuthor(@NotNull Author author) {
         authors.put(author.getAuthorId(), author);
     }
 
-    void addAuthorship(Long authorId, Long bookId) {
+    void addAuthorship(@NotNull Long authorId, @NotNull Long bookId) {
         Author author = authors.get(authorId);
         if (author == null)
             throw new IllegalArgumentException("Author with id = " + authorId + " does not exist");
@@ -33,7 +33,7 @@ public class Library {
     }
 
     @NotNull
-    public List<Book> findBooksByAuthorName(String name) {
+    public List<Book> findBooksByAuthorName(@NotNull String name) {
         Author author = authors.values().stream()
                 .filter(a ->
                         name.equalsIgnoreCase(getFullName(a))
@@ -44,7 +44,7 @@ public class Library {
     }
 
     @NotNull
-    static String getFullName(Author a) {
+    static String getFullName(@NotNull Author a) {
         return a.getFirstname() + (a.getSurname() == null ? "" : " " + a.getSurname());
     }
 }
