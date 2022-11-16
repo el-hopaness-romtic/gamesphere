@@ -1,4 +1,4 @@
-package ru.gamesphere;
+package ru.gamesphere.service;
 
 import lombok.Getter;
 
@@ -12,7 +12,7 @@ public class ArgsParser {
     private String username = "postgres";
     private String password = "12345678";
 
-    ArgsParser(String[] args) {
+    public ArgsParser(String[] args) {
         for (String arg : args) {
             if (arg.startsWith(JDBC_URL_ARGUMENT)) {
                 jdbcUrl = arg.substring(JDBC_URL_ARGUMENT.length());

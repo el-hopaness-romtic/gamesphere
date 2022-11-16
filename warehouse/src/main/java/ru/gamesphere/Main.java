@@ -1,6 +1,7 @@
 package ru.gamesphere;
 
 import org.flywaydb.core.Flyway;
+import ru.gamesphere.service.ArgsParser;
 
 import java.util.Locale;
 
