@@ -1,45 +1,37 @@
 package ru.gamesphere.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.gamesphere.domain.Organization;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import ru.gamesphere.domain.tables.records.OrganizationRecord;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+
+import static org.jooq.impl.DSL.sum;
+import static ru.gamesphere.domain.Tables.*;
 
 @RequiredArgsConstructor
 public class Report {
 
     private final Connection connection;
 
-    List<Organization> top10ByProduct(long productId) {
-        ArrayList<Organization> organizations = new ArrayList<>();
-        try (var statement = connection.prepareStatement("""
-                    SELECT o.*, SUM(p.amount) AS total_amount
-                    FROM organization o
-                    INNER JOIN shipping_list sl ON sl.organization_id = o.organization_id
-                    INNER JOIN position p ON p.shipping_list_id = sl.shipping_list_id AND p.product_id = ?
-                    GROUP BY o.organization_id
-                    ORDER BY total_amount DESC
-                    LIMIT 10
-                """)) {
-            statement.setLong(1, productId);
-            try (var resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    organizations.add(Organization.builder()
-                            .organizationId(resultSet.getLong("organization_id"))
-                            .accountNumber(resultSet.getString("accountNumber"))
-                            .inn(resultSet.getString("inn"))
-                            .name(resultSet.getString("name"))
-                            .build());
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    List<OrganizationRecord> top10ByProduct(long productId) {
+        DSLContext context = DSL.using(connection, SQLDialect.POSTGRES);
 
-        return organizations;
+        Field<BigDecimal> totalAmount = sum(POSITION.AMOUNT).as("total_amount");
+        return context.select(ORGANIZATION, totalAmount)
+                .from(ORGANIZATION)
+                .innerJoin(SHIPPING_LIST).on(SHIPPING_LIST.ORGANIZATION_ID.eq(ORGANIZATION.ORGANIZATION_ID))
+                .innerJoin(POSITION).on(POSITION.SHIPPING_LIST_ID.eq(SHIPPING_LIST.SHIPPING_LIST_ID))
+                .where(POSITION.PRODUCT_ID.eq(productId))
+                .groupBy(ORGANIZATION.ORGANIZATION_ID)
+                .orderBy(totalAmount.desc())
+                .limit(10)
+                .fetchInto(ORGANIZATION);
     }
 
 }

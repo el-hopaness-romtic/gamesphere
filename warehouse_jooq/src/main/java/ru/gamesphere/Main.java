@@ -1,8 +1,12 @@
 package ru.gamesphere;
 
-import org.flywaydb.core.Flyway;
-import ru.gamesphere.service.ArgsParser;
 
+import ru.gamesphere.service.ArgsParser;
+import ru.gamesphere.service.Report;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Locale;
 
 public class Main {
@@ -12,12 +16,10 @@ public class Main {
 
     public static void main(String[] args) {
         ArgsParser parser = new ArgsParser(args);
-        Flyway.configure()
-                .dataSource(parser.getJdbcUrl(),
-                        parser.getUsername(),
-                        parser.getPassword())
-                .locations("db")
-                .load()
-                .migrate();
+        try (Connection connection = DriverManager.getConnection(parser.getJdbcUrl(), parser.getUsername(), parser.getPassword())) {
+            Report report = new Report(connection);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

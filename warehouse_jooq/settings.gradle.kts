@@ -1,2 +1,3 @@
-rootProject.name = "warehouse"
-
+rootProject.name = "warehouse_jooq"
+include("database")
+include("database")
